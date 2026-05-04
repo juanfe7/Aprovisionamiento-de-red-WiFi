@@ -11,7 +11,7 @@ Este proyecto implementa una **solución de aprovisionamiento dinámico** que se
 
 ---
 
-## 2. Arquitectura del Sistema (Diseño de Ingeniería)
+## 2. Arquitectura del Sistema
 
 ### 2.1. Diagrama de Bloques (Hardware & Software)
 La solución se basa en una arquitectura de capas para garantizar la escalabilidad.
