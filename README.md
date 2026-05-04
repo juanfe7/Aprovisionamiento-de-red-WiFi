@@ -15,8 +15,13 @@ Este proyecto implementa una **solución de aprovisionamiento dinámico** que se
 
 ### 2.1. Diagrama de Bloques (Hardware & Software)
 La solución se basa en una arquitectura de capas para garantizar la escalabilidad y el desacoplamiento entre el hardware y la interfaz de usuario.
-> [!IMPORTANT]
-> [INSERTAR AQUÍ: Diagrama de Bloques que muestre la relación entre el ESP32, el NVS Flash, el Transceptor WiFi y la Interfaz de Usuario Web]
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/4191c80f-c4d9-4307-a620-5df02b7321c2" width="450" alt="Diagrama de Bloques de Arquitectura">
+  <br>
+  <b>Figura 1:</b> <i>Diagrama de arquitectura modular (Hardware, Lógica y Aplicación).</i>
+</p>
+
 
 ### 2.2. Modelo de Estados del Sistema
 El dispositivo opera bajo una máquina de estados finitos (FSM) que garantiza que el sistema siempre sea accesible:
@@ -58,8 +63,14 @@ El sistema expone una interfaz programática para facilitar la integración con 
 
 ### 5.1. Diagrama de Secuencia: Aprovisionamiento Inicial
 Describe el intercambio de mensajes entre el cliente (smartphone), el ESP32 y el Access Point externo.
-> [!TIP]
-> [INSERTAR AQUÍ: Diagrama UML de Secuencia profesional]
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/4a8c931e-a9e7-47d4-ad72-6f2756a31343" width="500" alt="Diagrama de Secuencia de Aprovisionamiento">
+  <br>
+  <b>Figura 2:</b> <i>Flujo de interacción entre Usuario, ESP32 y Almacenamiento NVS.</i>
+</p>
+
+
 
 ### 5.2. Mecanismo de Reset (Hardware Interrupt)
 Se implementó un manejador de interrupciones para el **GPIO 0 (Botón BOOT)**. Una pulsación prolongada (>3s) dispara la limpieza del namespace en la NVS y el reinicio del procesador, garantizando que el dispositivo nunca quede "ladrillo" (brick) por falta de red.
