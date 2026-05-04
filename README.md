@@ -45,23 +45,92 @@ La interfaz web ha sido desarrollada en **HTML5/CSS3 y JavaScript nativo**, embe
 
 ---
 
-## 4. Documentación de la API (RESTful Endpoints)
+## 4. Especificación de la API REST (Endpoints)
 
-El sistema expone una interfaz programática para facilitar la integración con aplicaciones móviles o tableros de control. Todas las respuestas utilizan el estándar `application/json`.
+El sistema expone una interfaz programática detallada para la interacción con el frontend y herramientas de diagnóstico. Todas las peticiones deben manejar el encabezado `Content-Type: application/json`.
 
-| Método | Endpoint | Descripción | Payload (JSON) |
-| :--- | :--- | :--- | :--- |
-| **GET** | `/api/status` | Estado de conexión, IP y señal RSSI | N/A |
-| **GET** | `/api/scan` | Lista de redes WiFi detectadas | N/A |
-| **POST** | `/api/connect` | Envío de SSID y Password para conexión | `{"ssid":"...","password":"..."}` |
-| **POST** | `/api/reset` | Borrado de credenciales y reinicio a modo AP | `{"confirm": true}` |
-| **GET** | `/api/info` | Información de hardware (Flash, MAC, ChipID) | N/A |
+### 4.1. Obtener Estado del Sistema
+Retorna el estado operativo actual del microcontrolador y su conectividad.
+*   **Endpoint:** `GET /api/status`
+*   **Respuesta Exitosa (200 OK):**
+    ```json
+    {
+      "status": "ok",
+      "mode": "sta", 
+      "connected": true,
+      "ssid": "MiRedWiFi",
+      "ip": "192.168.1.50",
+      "rssi": -65,
+      "uptime": 1234
+    }
+    ```
+    *Nota: El campo `mode` puede reportar: `sta`, `ap`, `connecting` o `unconfigured`.*
+
+### 4.2. Escanear Redes WiFi
+Inicia un escaneo de radiofrecuencia para detectar puntos de acceso cercanos.
+*   **Endpoint:** `GET /api/scan`
+*   **Respuesta Exitosa (200 OK):**
+    ```json
+    {
+      "status": "ok",
+      "count": 2,
+      "networks": [
+        {
+          "ssid": "MiRed",
+          "rssi": -45,
+          "encrypted": true,
+          "channel": 6,
+          "bssid": "AA:BB:CC:DD:EE:FF"
+        }
+      ]
+    }
+    ```
+*   **Respuesta de Error (500):** Error de hardware en el transceptor WiFi.
+
+### 4.3. Conectar a Nueva Red
+Configura credenciales, intenta el handshake y persiste los datos en NVS si la validación es exitosa.
+*   **Endpoint:** `POST /api/connect`
+*   **Cuerpo de la Petición (JSON):**
+    ```json
+    {
+      "ssid": "NombreDeMiRed", 
+      "password": "MiPasswordSeguro"
+    }
+    ```
+*   **Reglas de Validación:** `ssid` obligatorio (máx. 32 caracteres). `password` opcional para redes abiertas.
+*   **Respuesta Exitosa (200 OK):** Conexión establecida y datos guardados.
+*   **Respuesta de Error (400/500):** SSID faltante, formato inválido o fallo crítico de conexión con el AP.
+
+### 4.4. Restablecer Configuración (Factory Reset)
+Lógica de borrado seguro de la memoria persistente y retorno al estado de fábrica.
+*   **Endpoint:** `POST /api/reset`
+*   **Cuerpo (Opcional):** `{"confirm": true}`
+*   **Respuesta Exitosa (200 OK):**
+    ```json
+    {
+      "status": "ok",
+      "message": "Configuración borrada. Reiniciando en modo AP..."
+    }
+    ```
+
+### 4.5. Información Técnica del Dispositivo
+Telemetría de bajo nivel para auditoría de hardware.
+*   **Endpoint:** `GET /api/info`
+*   **Respuesta Exitosa (200 OK):** Incluye `chipId`, `chipModel`, `flashSize`, `macAddress` y versión del SDK.
 
 ---
 
-## 5. Diagramas UML (Validación de Flujo)
+## 5. Validación y Pruebas
+El sistema ha sido validado mediante pruebas funcionales de caja negra, asegurando que:
+1. El portal cautivo se activa en menos de 2 segundos tras un fallo de red.
+2. Las credenciales sobreviven a cortes de energía (Persistencia NVS).
+3. Los endpoints responden correctamente a herramientas de cliente (probado y verificado por el equipo).
 
-### 5.1. Diagrama de Secuencia: Aprovisionamiento Inicial
+---
+
+## 6. Diagramas UML (Validación de Flujo)
+
+### 6.1. Diagrama de Secuencia: Aprovisionamiento Inicial
 Describe el intercambio de mensajes entre el cliente (smartphone), el ESP32 y el Access Point externo.
 
 <p align="center">
@@ -72,12 +141,12 @@ Describe el intercambio de mensajes entre el cliente (smartphone), el ESP32 y el
 
 
 
-### 5.2. Mecanismo de Reset (Hardware Interrupt)
+### 6.2. Mecanismo de Reset (Hardware Interrupt)
 Se implementó un manejador de interrupciones para el **GPIO 0 (Botón BOOT)**. Una pulsación prolongada (>3s) dispara la limpieza del namespace en la NVS y el reinicio del procesador, garantizando que el dispositivo nunca quede "ladrillo" (brick) por falta de red.
 
 ---
 
-## 6. Guía de Uso e Instalación
+## 7. Guía de Uso e Instalación
 
 ### Requisitos Previos
 *   **Arduino IDE** (versión 2.0 o superior) o **VS Code + PlatformIO**.
@@ -99,29 +168,23 @@ Se implementó un manejador de interrupciones para el **GPIO 0 (Botón BOOT)**. 
 
 ---
 
-## 7. Resolución de Cuestionamientos Técnicos (20%)
+## 8. Resolución de Cuestionamientos Técnicos (20%)
 
 ### 7.1. Seguridad WPA2 Enterprise (PEAP)
 **¿Es posible conectarse?** Sí. 
 **Requerimientos:** El ESP32 soporta protocolos Enterprise mediante la librería `esp_wpa2.h`. A diferencia de WPA2-PSK, PEAP requiere una configuración de identidad y, opcionalmente, la carga de un **Certificado CA** en formato `.pem` para validar el servidor de autenticación (RADIUS).
 
-### 7.2. Concurrencia en WebServer
+### 8.2. Concurrencia en WebServer
 **Capacidad:** La librería `WebServer.h` estándar es síncrona y puede gestionar hasta **5 sockets** abiertos simultáneamente. Superar este límite puede causar denegación de servicio (DoS) en el portal.
 **Alternativas:** Para entornos con alta concurrencia, se recomienda **ESPAsyncWebServer**, que utiliza eventos asíncronos para manejar múltiples clientes simultáneos sin bloquear la ejecución del loop principal.
 
 ---
 
-## 8. Análisis de Viabilidad y Modelo de Negocio
+## 9. Análisis de Viabilidad y Modelo de Negocio
 Desde una perspectiva de ingeniería profesional, esta implementación:
 1.  **Eficiencia Operativa:** Reduce el ciclo de vida de mantenimiento al permitir que el usuario final resuelva problemas de conectividad.
 2.  **Versatilidad:** La arquitectura API REST permite que el dispositivo sea controlado por una App móvil de terceros en el futuro.
 3.  **Bajo Costo:** No requiere hardware adicional (pantallas o teclados) para la configuración inicial.
-
----
-
-## 9. Recursos Adicionales
-*   **Postman Collection:** Ubicada en `/docs/WiFi_Provisioning.postman_collection.json`.
-*   **Esquemáticos:** Ver carpeta `/hardware`.
 
 ---
 **Desarrollado por:** Juan Felipe Moncada, Samuel Arcos y Juan Felipe Cardenas  
