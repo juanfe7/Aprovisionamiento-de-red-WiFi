@@ -170,13 +170,23 @@ Se implementó un manejador de interrupciones para el **GPIO 0 (Botón BOOT)**. 
 
 ## 8. Resolución de Cuestionamientos Técnicos (20%)
 
-### 7.1. Seguridad WPA2 Enterprise (PEAP)
+### 8.1. Seguridad WPA2 Enterprise (PEAP)
 **¿Es posible conectarse?** Sí. 
 **Requerimientos:** El ESP32 soporta protocolos Enterprise mediante la librería `esp_wpa2.h`. A diferencia de WPA2-PSK, PEAP requiere una configuración de identidad y, opcionalmente, la carga de un **Certificado CA** en formato `.pem` para validar el servidor de autenticación (RADIUS).
 
 ### 8.2. Concurrencia en WebServer
 **Capacidad:** La librería `WebServer.h` estándar es síncrona y puede gestionar hasta **5 sockets** abiertos simultáneamente. Superar este límite puede causar denegación de servicio (DoS) en el portal.
 **Alternativas:** Para entornos con alta concurrencia, se recomienda **ESPAsyncWebServer**, que utiliza eventos asíncronos para manejar múltiples clientes simultáneos sin bloquear la ejecución del loop principal.
+
+### 8.3. Análisis de Consumo de Memoria Flash
+Se comparó el uso de recursos contra el ejemplo "Basic" de la librería WiFiManager.
+
+| Implementación | % de Memoria Flash Usada | Justificación |
+| :--- | :--- | :--- |
+| **WiFiManager (Basic)** | ~25% | Funcionalidad mínima sin API REST avanzada. |
+| **Nuestra Solución** | **77%** | Incluye motor JSON, API completa e interfaz UI en PROGMEM. |
+
+**Análisis:** El uso del 77% de la Flash se justifica por la robustez de la solución y la eliminación de dependencias externas, garantizando una arquitectura profesional.
 
 ---
 
