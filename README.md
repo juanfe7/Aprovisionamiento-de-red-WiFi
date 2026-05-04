@@ -17,7 +17,7 @@ Este proyecto implementa una **solución de aprovisionamiento dinámico** que se
 La solución se basa en una arquitectura de capas para garantizar la escalabilidad y el desacoplamiento entre el hardware y la interfaz de usuario.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/4191c80f-c4d9-4307-a620-5df02b7321c2" width="450" alt="Diagrama de Bloques de Arquitectura">
+  <img width="450" alt="Diagrama de Bloques de Arquitectura" src="https://github.com/user-attachments/assets/6df1131f-dd51-4aaf-be2e-f5c9e7078460" />
   <br>
   <b>Figura 1:</b> <i>Diagrama de arquitectura modular (Hardware, Lógica y Aplicación).</i>
 </p>
