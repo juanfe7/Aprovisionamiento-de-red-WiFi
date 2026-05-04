@@ -1,4 +1,4 @@
-# ESP32 WiFi Provisioning System (IoT Professional Solution)
+# Aprovisionamiento de red WiFi con ESP32
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform: ESP32](https://img.shields.io/badge/Platform-ESP32-blue.svg)](https://www.espressif.com/en/products/socs/esp32)
