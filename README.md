@@ -186,7 +186,7 @@ Se comparó el uso de recursos contra el ejemplo "Basic" de la librería WiFiMan
 | **WiFiManager (Basic)** | 77% | Funcionalidad mínima sin API REST avanzada. |
 | **Nuestra Solución** | **49%** | Incluye motor JSON, API completa e interfaz UI en PROGMEM. |
 
-**Análisis:** El uso del 77% de la Flash se justifica por la robustez de la solución y la eliminación de dependencias externas, garantizando una arquitectura profesional.
+**Análisis:** El uso del 49% de la Flash se justifica por la robustez de la solución y la eliminación de dependencias externas, garantizando una arquitectura profesional y más eficiente.
 
 ---
 
